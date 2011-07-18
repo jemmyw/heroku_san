@@ -47,6 +47,10 @@ end
   end
 end
 
+def retrieve_installed_addons(app)
+  `heroku addons --app #{app}`.strip.split
+end
+
 desc 'Select all Heroku apps for later command'
 task :all do
   @heroku_apps = @app_settings.keys
@@ -196,8 +200,16 @@ namespace :heroku do
   desc 'Add addons to each application.'
   task :addons do
     each_heroku_app do |name, app, repo, config, addons|
-      addons.each do |key, value|
-        sh "heroku addons:add --app #{app} #{key}:#{value}"
+      installed = retrieve_installed_addons(app)
+
+      addons.split(/\s/).each do |addon|
+        next if installed.include?(addon)
+
+        if installed.any?{|installed_addon| installed_addon.starts_with?(addon.split(':')[0])}
+          sh "heroku addons:upgrade --app #{app} #{addon}"
+        else
+          sh "heroku addons:add --app #{app} #{addon}"
+        end
       end
     end
   end
