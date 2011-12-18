@@ -169,7 +169,8 @@ namespace :heroku do
     each_heroku_app do |name, app, repo, config|
       command = "heroku config:add --app #{app}"
       config.each do |var, value|
-        command += " #{var}=#{value}"
+        value = value.gsub(/"/, %q|\"|)
+        command += %Q| #{var}="#{value}"|
       end
       sh(command)
     end
