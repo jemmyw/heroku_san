@@ -379,7 +379,12 @@ def each_heroku_app
       config = @app_settings[name]['config'] || {}
       config.merge!(@extra_config[name]) if (@extra_config && @extra_config[name])
       addons = @app_settings[name]['addons'] || {}
-      yield(name, app, "git@heroku.com:#{app}.git", config, addons)
+      if @app_settings[name].has_key? 'repo'
+        repo = @app_settings[name]['repo']
+      else
+        repo = "git@heroku.com:#{app}.git"
+      end
+      yield(name, app, repo, config, addons)
     end
     puts
   else
