@@ -218,7 +218,7 @@ namespace :heroku do
   desc 'Runs a rake task remotely'
   task :rake, :task do |t, args|
     each_heroku_app do |name, app, repo|
-      sh "heroku #{run_or_rake(app)} #{args[:task]}"
+      run_rake(app, args[:task])
     end
   end
 
@@ -413,12 +413,16 @@ def push(commit, repo)
 end
 
 def migrate(app)
-  sh "heroku #{run_or_rake(app)} db:migrate"
+  run_rake(app, "db:migrate")
   sh "heroku restart --app #{app}"
 end
 
 def maintenance(app, action)
   sh "heroku maintenance:#{action} --app #{app}"
+end
+
+def run_rake(app, task)
+  sh "heroku #{run_or_rake(app)} #{task}"
 end
 
 # `heroku rake foo` has been superseded by `heroku run rake foo` on cedar
