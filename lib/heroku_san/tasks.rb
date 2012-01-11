@@ -206,7 +206,7 @@ namespace :heroku do
       addons.split(/\s/).each do |addon|
         next if installed.include?(addon)
 
-        if installed.any?{|installed_addon| installed_addon.starts_with?(addon.split(':')[0])}
+        if installed.any?{|installed_addon| installed_addon.start_with?(addon.split(':')[0])}
           sh "heroku addons:upgrade --app #{app} #{addon}"
         else
           sh "heroku addons:add --app #{app} #{addon}"
